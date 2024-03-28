@@ -2,7 +2,20 @@
 
 module singlecycle(
 	input logic clk_i,
-	input logic rst_ni
+	input logic rst_ni,
+	input logic [31:0] io_sw_i,
+	//output logic [31:0] pc_debug_o,
+	output logic [31:0] io_lcd_o,
+	output logic [31:0] io_ledg_o,
+	output logic [31:0] io_ledr_o,
+	output logic [31:0] io_hex0_o,
+	output logic [31:0] io_hex1_o,
+	output logic [31:0] io_hex2_o,
+	output logic [31:0] io_hex3_o,
+	output logic [31:0] io_hex4_o,
+	output logic [31:0] io_hex5_o,
+	output logic [31:0] io_hex6_o,
+	output logic [31:0] io_hex7_o
 	);
 	logic RegWEn_w, Bsel_w, MemRW_w, BrEq_w, BrLt_w, PCSel_w, BrUn_w, Asel_w, Mul_ext_w;
 	logic overf_pc_r;
@@ -94,7 +107,19 @@ module singlecycle(
 		.MemRW_i(MemRW_w),
 		.clk_i(clk_i),
 		.dataR_o(mem_w),
-		.rst_ni(rst_ni)
+		.rst_ni(rst_ni),
+		.io_sw_i(io_sw_i),
+		.io_lcd_o(io_lcd_o),
+		.io_ledg_o(io_ledg_o),
+		.io_ledr_o(io_ledr_o),
+		.io_hex0_o(io_hex0_o),
+		.io_hex1_o(io_hex1_o),
+		.io_hex2_o(io_hex2_o),
+		.io_hex3_o(io_hex3_o),
+		.io_hex4_o(io_hex4_o),
+		.io_hex5_o(io_hex5_o),
+		.io_hex6_o(io_hex6_o),
+		.io_hex7_o(io_hex7_o)
 		);
 		
 //	mux2to1_32bit M1(
@@ -127,6 +152,7 @@ module singlecycle(
 		.Mul_ext_o(Mul_ext_w)
 		);
 		
+	//assign pc_debug_o = pc_w;
 	
 endmodule
 

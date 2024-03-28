@@ -1,5 +1,5 @@
 
-//`include "define.sv"
+`include "define.sv"
 
 module alu(
 	input logic [31:0]  rs1_i,  rs2_i,
