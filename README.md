@@ -10,5 +10,7 @@ The intructions were designed contains:
   lui, auipc
   And an extention instruction: mul
 This is the diagram of processor
-https://github.com/Stork1323/Single_Cycle_Processor_RISC_V_32I/issues/1#issue-2208791340
+![image](https://github.com/Stork1323/Single_Cycle_Processor_RISC_V_32I/assets/136346435/62569c58-0396-4619-921d-720551de87ce)
+
+In this project, I wrote assembly code for specific application. The detail of application is in src/assembly_for_application.txt
 
