@@ -24,11 +24,11 @@ module alu_tb();
 	endtask
 	
 	initial begin
-		rst_ni = 1'b0;
-		#3;
+		//rst_ni = 1'b0;
+		//#3;
 		
-		rst_ni = 1'b1;
-		#1;
+		//rst_ni = 1'b1;
+		//#1;
 		
 		AluSel_i = 4'b0000; //add
 		rs1_i = $random;
@@ -112,6 +112,6 @@ module alu_tb();
 	end
 	
 	
-	always #(`clk) clk_i = ~clk_i;
+	//always #(`clk) clk_i = ~clk_i;
 
 endmodule
