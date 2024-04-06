@@ -20,25 +20,48 @@
 // The program for application (not test yet)
 // In the top of code, cpu will load the value from switch, (notice switch 16 is trigger signal for reading value from switches), then compare the sw[16] with 1 (1 is trigger), if it's equal 1, value from sw[15:0] will be store in memory start at 0 address. if it's equal 0 the program will wait until the input passed. The memory will store 6 values from switches corresponding to 3 coordinate of 3 points A, B, C. After that, the program will compute the distances between A, C and A, B. In the end, cpu will compare 2 of distances in order to get the result
 
-addi x6, x0, 1
+/*
+	Tested on ModelSim with scale time
+	
+	Wait for input -> SW[15:0]:data, when push the button KEY[0] then data will be load (6 times)
+	-> compute distances between A vs C and B vs C -> compare -> display on lcd
+*/
+
+LCD:
+
+/*
+	Neu AC < BC thi hien A closer to C
+	Neu AC > BC thi hien B closer to C
+*/
+addi x3, x0, 0x79
+sw x3, 256(x0)
+sw x3, 257(x0)
+sw x3, 258(x0)
+sw x3, 259(x0)
+sw x3, 260(x0)
+sw x3, 261(x0)
+sw x3, 262(x0)
+sw x3, 263(x0)
+
+
 addi x8, x0, 0
 addi x5, x0, 6
-addi x17, x0, 1
-
 
 load: lw x9, 320(x0)
 srli x7, x9, 16
-beq x7, x6, store
-addi x17, x0, 1
+bne x7, x0, load
+addi x21, x0, 100
+jal x1, Delay_x100us
+lw x9, 320(x0)
+srli x7, x9, 16
+
+beq x7, x0, store
 jal x1, load
 
-store: beq x17, x6, next
-jal x1, load
-next: slli x9, x9, 16
+store:slli x9, x9, 16
 srai x9, x9, 16
 sw x9, 0(x8)
-sw x9, 246(x0)
-addi x17, x0, 0
+sw x9, 264(x0)
 addi x8, x8, 1
 bltu x8, x5, load
 
@@ -50,8 +73,6 @@ lw x11, 2(x0)
 lw x14, 3(x0)
 lw x12, 4(x0)
 lw x15, 5(x0)
-
-
 
 
 sub x10, x12, x10
@@ -66,34 +87,12 @@ mul x11, x11, x11
 mul x14, x14, x14
 add x11, x11, x14
 
-slt x16, x10, x11
 
-
-
-x17 : checking variable attempt to avoid read 1 value from switches many times
-
-Nếu sw[17]=1 -> store, x17=0 chưa sẵn sàng đọc giá trị tiếp theo
-Nếu sw[17]=0 -> load, x17=1 sẵn sàng đọc giá trị tiếp theo
-
-
-
-LCD:
-
-/*
-	Neu AC < BC thi hien A closer to C
-	Neu AC > BC thi hien B closer to C
-*/
 blt x10, x11, A
-addi x28, x0, 0x42	// ki tu B
+addi x28, x0, 0x42
 jal x1, skip
-A: addi x28, x0, 0x41	// ki tu A
 
-/*
-	x24 tuong ung voi lcd_e muc 1
-	x25 tuong ung voi lcd_e muc 0
-	x26 tuong ung voi lcd_rs muc 1
-	x27 tuong ung voi lcd_rs muc 0
-*/
+A: addi x28, x0, 0x41
 
 skip: addi x24, x0, 1024
 addi x25, x0, -1025
@@ -103,115 +102,116 @@ addi x27, x27, -513
 
 addi x22, x0, 1
 slli x22, x22, 31
-sw x22, 266(x0)		// lcd_on = 1
-addi x21, x0, 500	// delay 50ms
+sw x22, 266(x0)		
+addi x21, x0, 500
 jal x1, Delay_x100us
-addi x23, x0, 0x30	// gui lenh 0x30 lan 1
+and x22, x22, x27
+addi x23, x0, 0x30	
 jal x2, OUT_LCD
-addi x21, x0, 42	// delay 4.2ms
+addi x21, x0, 42	
 jal x1, Delay_x100us
-addi x23, x0, 0x30	// gui lenh 0x30 lan 2
+and x22, x22, x27
+addi x23, x0, 0x30	
 jal x2, OUT_LCD
 addi x21, x0, 2
-jal x1, Delay_x100us	// delay 200us
-addi x23, x0, 0x30	// gui lenh 0x30 lan 3
-jal x2, OUT_LCD
-addi x21, x0, 1		// delay 100us
 jal x1, Delay_x100us
-addi x23, x0, 0x38	// gui lenh 0x38
+and x22, x22, x27
+addi x23, x0, 0x30	
 jal x2, OUT_LCD
 addi x21, x0, 1		
-jal x1, Delay_x100us	// delay 100us
-addi x23, x0, 0x01	// gui lenh 0x01
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x38	
+jal x2, OUT_LCD
+addi x21, x0, 1		
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x01	
 jal x2, OUT_LCD
 addi x21, x0, 20
-jal x1, Delay_x100us	// delay 2ms
-addi x23, x0, 0x0C	// gui lenh 0x0C
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x0C
 jal x2, OUT_LCD
 addi x21, x0, 1
-jal x1, Delay_x100us	// delay 100us
-addi x23, x0, 0x06	// gui lenh 0x06
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x06	
 jal x2, OUT_LCD
 
-/*
-	Xuat chuoi ki tu ra lcd
-*/
-
-start: and x22, x22, x27	// gui command
-addi x23, x0, 0x01	// xoa man hinh
+start: and x22, x22, x27	
+addi x23, x0, 0x01	
 jal x2, OUT_LCD
-addi x21, x0, 20	// delay 2ms
+addi x21, x0, 20	
 jal x1, Delay_x100us
-or x22, x22, x26	// gui data
-add x23, x0, x28	// xuat ki tu A hoac B
+or x22, x22, x26	
+add x23, x0, x28	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x20	// xuat dau cach
+addi x23, x0, 0x20	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x63	// xuat ki tu c
+addi x23, x0, 0x63	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x6C	// xuat ki tu l
+addi x23, x0, 0x6C	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x6F	// xuat ki tu o
+addi x23, x0, 0x6F	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x73	// xuat ki tu s
+addi x23, x0, 0x73	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x65	// xuat ki tu e
+addi x23, x0, 0x65	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x72	// xuat ki tu r
+addi x23, x0, 0x72	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x20	// xuat dau cach
+addi x23, x0, 0x20	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x74	// xuat ki tu t
+addi x23, x0, 0x74	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x6F	// xuat ki tu o
+addi x23, x0, 0x6F
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x20	// xuat dau cach
+addi x23, x0, 0x20	
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x43	// xuat ki tu C
+addi x23, x0, 0x43
 jal x2, OUT_LCD
-addi x21, x0, 1
+addi x21, x0, 2000
 jal x1, Delay_x100us
 jal x1, start
 
-/*
-	function delay x21 * 100us
-*/
+
 
 Delay_x100us: addi x0, x0, 0
 L1: addi x20, x0, 1000
@@ -224,22 +224,12 @@ addi x21, x21, -1
 bne x21, x0, L1
 jalr x1, x1, 0
 
-/*
-	function delay 1us
-*/
 
-Delay_1us: addi x20, x0, 50
+Delay_1us: addi x20, x0, 25
 L21: addi x20, x20, -1
-addi x0, x0, 0
-addi x0, x0, 0
-addi x0, x0, 0
 bne x20, x0, L21
 jalr x1, x1, 0
 
-/*
-	Ham gui du lieu toi lcd
-	Canh xuong lcd_e
-*/
 
 OUT_LCD: add x22, x22, x23
 sw x22, 266(x0)
@@ -249,7 +239,12 @@ sw x22, 266(x0)
 jal x1, Delay_1us
 and x22, x22, x25
 sw x22, 266(x0)
+jal x1, Delay_1us
+srli x22, x22, 8
+slli x22, x22, 8
 jalr x1, x2, 0
+
+
 
 
 
