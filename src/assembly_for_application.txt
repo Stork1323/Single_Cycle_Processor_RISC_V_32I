@@ -63,7 +63,18 @@ srai x9, x9, 16
 sw x9, 0(x8)
 sw x9, 264(x0)
 addi x8, x8, 1
-bltu x8, x5, load
+
+loop: lw x9, 320(x0)
+srli x7, x9, 16
+beq x7, x0, loop
+addi x21, x0, 100
+jal x1, Delay_x100us
+lw x9, 320(x0)
+srli x7, x9, 16
+bne x7, x0, next
+jal x1, loop
+
+next: bltu x8, x5, load
 
 
 
@@ -243,6 +254,10 @@ jal x1, Delay_1us
 srli x22, x22, 8
 slli x22, x22, 8
 jalr x1, x2, 0
+
+
+
+
 
 
 
