@@ -154,6 +154,17 @@ module singlecycle(
 		
 	//assign pc_debug_o = pc_w;
 	
+	// print on lcd
+//	lcd16x2 LCD(
+//		.clk_i(clk_i),
+//		.cond_i(),
+//		.lcd_e_o(),
+//		.lcd_rs_o(), 
+//		.lcd_rw_o(), 
+//		.lcd_on_o(),
+//		.data_o()
+//		);
+	
 endmodule
 
 
