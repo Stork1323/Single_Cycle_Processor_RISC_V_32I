@@ -33,7 +33,7 @@ LCD:
 	Neu AC < BC thi hien A closer to C
 	Neu AC > BC thi hien B closer to C
 */
-addi x3, x0, 0x79
+addi x3, x0, 0x40
 sw x3, 256(x0)
 sw x3, 257(x0)
 sw x3, 258(x0)
@@ -43,40 +43,122 @@ sw x3, 261(x0)
 sw x3, 262(x0)
 sw x3, 263(x0)
 
+addi x24, x0, 1024  # E -> 1
+addi x25, x0, -1025 # E -> 0
+addi x26, x26, 512  # RS -> 1
+addi x27, x27, -513 # RS -> 0
+
+
+addi x22, x0, 1
+slli x22, x22, 31
+sw x22, 266(x0)	    # LCD_ON = 1	
+addi x21, x0, 500   # delay 50ms
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x30	   # send command 0x30 first time
+jal x2, OUT_LCD
+addi x21, x0, 42    # delay 4.2ms
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x30	    # send command 0x30 second time
+jal x2, OUT_LCD
+addi x21, x0, 2     # delay 0.2ms
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x30	    # send command 0x30 third time
+jal x2, OUT_LCD
+addi x21, x0, 1		# delay 100us
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x38	    # send command 0x38
+jal x2, OUT_LCD
+addi x21, x0, 1		# delay 100us
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x01	   # send command 0x01
+jal x2, OUT_LCD
+addi x21, x0, 20    # delay 2ms
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x0C  # send command 0x0C
+jal x2, OUT_LCD
+addi x21, x0, 1     # delay 100us
+jal x1, Delay_x100us
+and x22, x22, x27
+addi x23, x0, 0x06	# send command 0x06
+jal x2, OUT_LCD
+addi x21, x0, 1     # delay 100us
+jal x1, Delay_x100us
+
+#display Hello
+
+and x22, x22, x27	
+addi x23, x0, 0x01	    # clear lcd
+jal x2, OUT_LCD
+addi x21, x0, 20        # delay 2ms
+jal x1, Delay_x100us
+or x22, x22, x26	
+addi x23, x0, 0x48	    # print H charactor
+jal x2, OUT_LCD
+addi x21, x0, 1
+jal x1, Delay_x100us
+or x22, x22, x26
+addi x23, x0, 0x65	    # print e charactor
+jal x2, OUT_LCD
+addi x21, x0, 1
+jal x1, Delay_x100us
+or x22, x22, x26
+addi x23, x0, 0x6C	    # print l charactor
+jal x2, OUT_LCD
+addi x21, x0, 1
+jal x1, Delay_x100us
+or x22, x22, x26
+addi x23, x0, 0x6C	    # print l charactor
+jal x2, OUT_LCD
+addi x21, x0, 1
+jal x1, Delay_x100us
+or x22, x22, x26
+addi x23, x0, 0x6F	    # print o charactor
+jal x2, OUT_LCD
 
 addi x8, x0, 0
 addi x5, x0, 6
 
 load: lw x9, 320(x0)
 srli x7, x9, 16
-bne x7, x0, load
-addi x21, x0, 100
-jal x1, Delay_x100us
+bne x7, x0, load        #------------------------
+
+addi x21, x0, 50
+re_read: 
 lw x9, 320(x0)
 srli x7, x9, 16
-
-beq x7, x0, store
-jal x1, load
+bne x7, x0, load
+addi x21, x21, -1
+bne x21, x0, re_read        #---------------------------
 
 store:slli x9, x9, 16
 srai x9, x9, 16
 sw x9, 0(x8)
 sw x9, 264(x0)
+addi x3, x0, 0x30
+sw x3, 256(x8)
 addi x8, x8, 1
 
 loop: lw x9, 320(x0)
 srli x7, x9, 16
 beq x7, x0, loop
-addi x21, x0, 100
-jal x1, Delay_x100us
+
+addi x21, x0, 50
+re_read_2: 
 lw x9, 320(x0)
 srli x7, x9, 16
-bne x7, x0, next
-jal x1, loop
+beq x7, x0, loop
+addi x21, x21, -1
+bne x21, x0, re_read_2
 
 next: bltu x8, x5, load
 
-
+# compute
 
 lw x10, 0(x0)
 lw x13, 1(x0)
@@ -101,129 +183,85 @@ add x11, x11, x14
 
 blt x10, x11, A
 addi x28, x0, 0x42
-jal x1, skip
+jal x1, start
 
 A: addi x28, x0, 0x41
 
-skip: addi x24, x0, 1024
-addi x25, x0, -1025
-addi x26, x26, 512
-addi x27, x27, -513
-
-
-addi x22, x0, 1
-slli x22, x22, 31
-sw x22, 266(x0)		
-addi x21, x0, 500
-jal x1, Delay_x100us
-and x22, x22, x27
-addi x23, x0, 0x30	
-jal x2, OUT_LCD
-addi x21, x0, 42
-jal x1, Delay_x100us
-and x22, x22, x27
-addi x23, x0, 0x30	
-jal x2, OUT_LCD
-addi x21, x0, 2
-jal x1, Delay_x100us
-and x22, x22, x27
-addi x23, x0, 0x30	
-jal x2, OUT_LCD
-addi x21, x0, 1		
-jal x1, Delay_x100us
-and x22, x22, x27
-addi x23, x0, 0x38	
-jal x2, OUT_LCD
-addi x21, x0, 1		
-jal x1, Delay_x100us
-and x22, x22, x27
-addi x23, x0, 0x01	
-jal x2, OUT_LCD
-addi x21, x0, 20
-jal x1, Delay_x100us
-and x22, x22, x27
-addi x23, x0, 0x0C
-jal x2, OUT_LCD
-addi x21, x0, 1
-jal x1, Delay_x100us
-and x22, x22, x27
-addi x23, x0, 0x06	
-jal x2, OUT_LCD
-
+# display result A or B closer to C
 start: and x22, x22, x27	
-addi x23, x0, 0x01	
+addi x23, x0, 0x01	    # clear lcd
 jal x2, OUT_LCD
-addi x21, x0, 20
+addi x21, x0, 20        # delay 2ms
 jal x1, Delay_x100us
 or x22, x22, x26	
-add x23, x0, x28	
+add x23, x0, x28	    # print A or B charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x20	
+addi x23, x0, 0x20	    # print space
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x63	
+addi x23, x0, 0x63	    # print c charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x6C	
+addi x23, x0, 0x6C	    # print l charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x6F	
+addi x23, x0, 0x6F	    # print o charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x73	
+addi x23, x0, 0x73	    # print s charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x65	
+addi x23, x0, 0x65	    # print e charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x72	
+addi x23, x0, 0x72	    # print r charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x20	
+addi x23, x0, 0x20	    # print space
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x74	
+addi x23, x0, 0x74	    # print t charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x6F
+addi x23, x0, 0x6F  # print o charactor
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x20	
+addi x23, x0, 0x20	    # print space
 jal x2, OUT_LCD
 addi x21, x0, 1
 jal x1, Delay_x100us
 or x22, x22, x26
-addi x23, x0, 0x43
+addi x23, x0, 0x43      # print C charactor
 jal x2, OUT_LCD
-addi x21, x0, 2000
+addi x21, x0, 2000      # wait 2ms
 jal x1, Delay_x100us
-jal x1, start
+jal x1, start           # print again
 
 
-
+# delay x21 * 100us function
 Delay_x100us: addi x0, x0, 0
 L1: addi x20, x0, 1000
 L2: addi x20, x20, -1
@@ -235,25 +273,29 @@ addi x21, x21, -1
 bne x21, x0, L1
 jalr x1, x1, 0
 
-
-Delay_1us: addi x20, x0, 25
+#delay 80us function
+Delay_80us: addi x20, x0, 2000
 L21: addi x20, x20, -1
 bne x20, x0, L21
 jalr x1, x1, 0
 
-
+#send data to lcd
 OUT_LCD: add x22, x22, x23
 sw x22, 266(x0)
-jal x1, Delay_1us
+jal x1, Delay_80us
 or x22, x22, x24
 sw x22, 266(x0)
-jal x1, Delay_1us
+jal x1, Delay_80us
 and x22, x22, x25
 sw x22, 266(x0)
-jal x1, Delay_1us
+jal x1, Delay_80us
 srli x22, x22, 8
 slli x22, x22, 8
 jalr x1, x2, 0
+
+
+
+
 
 
 
