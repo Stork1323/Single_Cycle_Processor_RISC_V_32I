@@ -273,25 +273,26 @@ addi x21, x21, -1
 bne x21, x0, L1
 jalr x1, x1, 0
 
-#delay 80us function
-Delay_80us: addi x20, x0, 2000
-L21: addi x20, x20, -1
-bne x20, x0, L21
-jalr x1, x1, 0
 
 #send data to lcd
 OUT_LCD: add x22, x22, x23
 sw x22, 266(x0)
-jal x1, Delay_80us
+addi x21, x0, 1
+jal x1, Delay_x100us
 or x22, x22, x24
 sw x22, 266(x0)
-jal x1, Delay_80us
+addi x21, x0, 1
+jal x1, Delay_x100us
 and x22, x22, x25
 sw x22, 266(x0)
-jal x1, Delay_80us
+addi x21, x0, 1
+jal x1, Delay_x100us
 srli x22, x22, 8
 slli x22, x22, 8
 jalr x1, x2, 0
+
+
+
 
 
 
