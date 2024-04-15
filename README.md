@@ -18,6 +18,6 @@ This is the diagram of processor
 
 In this project, I wrote assembly code for specific application. The detail of application is in src/assembly_for_application.txt
 
-Below are the conventions to drive output peripherals and read switches:
+Below picture describes the conventions to drive output peripherals and read switches:
 
 ![image](https://github.com/Stork1323/Single_Cycle_Processor_RISC_V_32I/assets/136346435/f8960486-81d8-497d-9e85-68567a363e66)
